@@ -2,7 +2,6 @@
 
 namespace console\controllers;
 
-use core\entities\consultation\ConsultationDiagnosis;
 use core\helpers\user\UserHelper;
 use moonland\phpexcel\Excel;
 use yii\console\Controller;
@@ -38,51 +37,23 @@ class AdminController extends Controller
 
     public function actionExcel()
     {
-        $fileName  = \Yii::$app->getBasePath() . '/Dataset.xlsx';
+        $fileName = \Yii::$app->getBasePath() . '/msc.xlsx';
 
         $data = Excel::widget([
-                                                     'mode' => 'import',
-                                                     'fileName' => $fileName,
-                                                     //'setFirstRecordAsKeys' => true, // if you want to set the keys of record column with first record, if it not set, the header with use the alphabet column on excel.
-                                                     //'setIndexSheetByName' => true, // set this if your excel data with multiple worksheet, the index of array will be set with the sheet name. If this not set, the index will use numeric.
-                                                     //'getOnlySheet' => 'sheet1', // you can set this property if you want to get the specified sheet from the excel data with multiple worksheet.
-                                                 ]);
+                                  'mode'     => 'import',
+                                  'fileName' => $fileName,
+                                  'getOnlySheet' => 'СППВР Москва'
+                              ]);
 
         $indx = 1;
-        foreach ($data as $item)
-        {
-
-            if (is_null($item['Пол пациента']))
-            {
+        foreach ($data as $item) {
+            if ($indx > 1) {
                 continue;
             }
-
-            $str = $item['Назначения'];
-
-            $arrPurpose = [];
-            $arrTemp = explode(PHP_EOL, $str);
-            foreach ($arrTemp as $arr)
-            {
-                if (strlen($arr) == 0)
-                {
-                    continue;
-                }
-
-                $arrTemp2 = explode(';', $arr);
-                foreach ($arrTemp2 as $arr2)
-                {
-                    $arrPurpose[] = mb_strtolower(trim($arr2));
-                }
-
-            }
-            var_dump($arrPurpose);
-
+            var_dump($item);
             $indx++;
 
-            if ($indx > 12)
-            {
-                return;
-            }
+
         }
         //var_dump($data);
     }

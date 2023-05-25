@@ -33,6 +33,15 @@ class Mkb10Repository
     }
 
 
+    /**
+     * @return Mkb10[]
+     */
+    public function listItems(): array
+    {
+        return Mkb10::find()->orderBy(['name' => SORT_ASC])->all();
+    }
+
+
     public function save(Mkb10 $item)
     {
         if (!$item->save()) {

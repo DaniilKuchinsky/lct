@@ -27,6 +27,12 @@ use hail812\adminlte\widgets\Menu;
                                           'active' => $this->context->id == 'user',
                                       ],
                                       [
+                                          'label' => 'Стандарт Москвы',
+                                          'icon'  => 'th',
+                                          'url'   => ['standard-moscow/index'],
+                                          'active' => $this->context->id == 'standard-moscow',
+                                      ],
+                                      [
                                           'label' => 'Консультации',
                                           'icon'  => 'th',
                                           'url'   => ['consultation/index'],

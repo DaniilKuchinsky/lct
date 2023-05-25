@@ -32,6 +32,15 @@ class DestinationRepository
     }
 
 
+    /**
+     * @return Destination[]
+     */
+    public function listItems(): array
+    {
+        return Destination::find()->orderBy(['name' => SORT_ASC])->all();
+    }
+
+
     public function save(Destination $item)
     {
         if (!$item->save()) {
