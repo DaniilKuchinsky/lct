@@ -15,18 +15,18 @@ class ConsultationDiagnosisRepository
      */
     public function get(int $id): ConsultationDiagnosis
     {
-        if (!$user = ConsultationDiagnosis::findOne($id)) {
+        if (!$item = ConsultationDiagnosis::findOne($id)) {
             throw new \DomainException('Запись не найдена');
         }
 
-        return $user;
+        return $item;
     }
 
 
 
-    public function save(ConsultationDiagnosis $user)
+    public function save(ConsultationDiagnosis $item)
     {
-        if (!$user->save()) {
+        if (!$item->save()) {
             throw new \RuntimeException('Ошибка сохранения данных');
         }
     }

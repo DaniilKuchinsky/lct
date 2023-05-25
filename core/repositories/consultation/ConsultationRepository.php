@@ -14,11 +14,11 @@ class ConsultationRepository
      */
     public function get(int $id): Consultation
     {
-        if (!$user = Consultation::findOne($id)) {
+        if (!$item = Consultation::findOne($id)) {
             throw new \DomainException('Запись не найдена');
         }
 
-        return $user;
+        return $item;
     }
 
 
@@ -29,17 +29,17 @@ class ConsultationRepository
      */
     public function getByUniqueId(string $uniqueId): Consultation
     {
-        if (!$user = Consultation::findOne(['uniqueId' => $uniqueId])) {
+        if (!$item = Consultation::findOne(['uniqueId' => $uniqueId])) {
             throw new \DomainException('Запись не найдена');
         }
 
-        return $user;
+        return $item;
     }
 
 
-    public function save(Consultation $user)
+    public function save(Consultation $item)
     {
-        if (!$user->save()) {
+        if (!$item->save()) {
             throw new \RuntimeException('Ошибка сохранения данных');
         }
     }
