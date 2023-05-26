@@ -2,6 +2,8 @@
 
 namespace core\helpers\consultation;
 
+use core\entities\consultation\ConsultationDiagnosisDestination;
+use core\entities\standard\StandardMoscow;
 use Yii;
 
 class ConsultationHelper
@@ -17,6 +19,17 @@ class ConsultationHelper
     const STATUS_ERROR     = 5;
 
 
+    const STATUS_STANDARD_1 = 1;
+
+    const STATUS_STANDARD_2 = 2;
+
+    const STATUS_STANDARD_3 = 3;
+
+    const STATUS_STANDARD_4 = 4;
+
+    const STATUS_STANDARD_5 = 5;
+
+
     /**
      * @return array
      */
@@ -30,6 +43,7 @@ class ConsultationHelper
             self::STATUS_ERROR     => 'Ошибка',
         ];
     }
+
 
     /**
      * @return array
@@ -61,6 +75,7 @@ class ConsultationHelper
         return null;
     }
 
+
     /**
      * @param int $status
      *
@@ -86,5 +101,84 @@ class ConsultationHelper
     public static function generateUniqueId(int $length = 60): string
     {
         return Yii::$app->security->generateRandomString($length);
+    }
+
+
+    /**
+     * @return array
+     */
+    public static function getStatusStandardList(): array
+    {
+        return [
+            self::STATUS_STANDARD_1 => 'Установленные обязательные назначение в соответствии со стандартом г. Москвы',
+            self::STATUS_STANDARD_2 => 'Установленные необязательные назначение в соответствии со стандартом г. Москвы',
+            self::STATUS_STANDARD_3 => 'Установленные обязательные назначение в соответствии с Федеральным стандартом',
+            self::STATUS_STANDARD_4 => 'Установленные необязательные назначение в соответствии с Федеральным стандартом',
+            self::STATUS_STANDARD_5 => 'Установленные назначения без соответствия стандартам',
+        ];
+    }
+
+
+    /**
+     * @param int $status
+     *
+     * @return string
+     */
+    public static function getStatusStandardName(int $status): ?string
+    {
+        $types = self::getStatusStandardList();
+        if (array_key_exists($status, $types)) {
+            return $types[ $status ];
+        }
+
+        return null;
+    }
+
+
+    /**
+     * @param StandardMoscow[]                   $standards
+     * @param ConsultationDiagnosisDestination[] $destinations
+     *
+     * @return bool
+     */
+    public static function compareDestinationWithMoscow(array $standards, array $destinations): bool
+    {
+        $arrName = [];
+        foreach ($standards as $standard) {
+            $arrName[] = $standard->destination->name;
+        }
+
+        if (count($arrName) == 0) {
+            return false;
+        }
+
+
+        foreach ($destinations as $destination) {
+            if (($key = array_search($destination->name, $arrName)) !== false) {
+                unset($arrName[ $key ]);
+            }
+        }
+
+        return count($arrName) > 0;
+    }
+
+
+    /**
+     * @param StandardMoscow[] $standards
+     *
+     * @return bool
+     */
+    public static function standardMoscowAllImportant(array $standards): bool
+    {
+        if (count($standards) == 0) {
+            return false;
+        }
+        foreach ($standards as $standard) {
+            if (!$standard->isImportant) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

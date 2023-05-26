@@ -12,6 +12,9 @@ use core\helpers\user\UserHelper;
 use core\repositories\consultation\ConsultationDiagnosisDestinationRepository;
 use core\repositories\consultation\ConsultationDiagnosisRepository;
 use core\repositories\consultation\ConsultationRepository;
+use core\repositories\dictionary\DestinationRepository;
+use core\repositories\dictionary\Mkb10Repository;
+use core\repositories\standard\StandardMoscowRepository;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
 
@@ -25,16 +28,28 @@ class ConsultationService
 
     protected EventDispatcher                            $dispatcher;
 
+    protected Mkb10Repository                            $repMkb10;
+
+    protected DestinationRepository                      $repDestination;
+
+    protected StandardMoscowRepository                   $repStandardMoscow;
+
 
     public function __construct(
         ConsultationRepository                     $repConsultation,
         ConsultationDiagnosisRepository            $repConsultationDiagnosis,
         ConsultationDiagnosisDestinationRepository $repConsultationDiagnosisDestination,
+        Mkb10Repository                            $repMkb10,
+        DestinationRepository                      $repDestination,
+        StandardMoscowRepository                   $repStandardMoscow,
         EventDispatcher                            $dispatcher
     ) {
         $this->repConsultation                     = $repConsultation;
         $this->repConsultationDiagnosis            = $repConsultationDiagnosis;
         $this->repConsultationDiagnosisDestination = $repConsultationDiagnosisDestination;
+        $this->repMkb10                            = $repMkb10;
+        $this->repDestination                      = $repDestination;
+        $this->repStandardMoscow                   = $repStandardMoscow;
         $this->dispatcher                          = $dispatcher;
     }
 
@@ -168,7 +183,44 @@ class ConsultationService
     {
         $this->setStatusConsultation($consultation->id, ConsultationHelper::STATUS_ANALYSIS);
 
+        foreach ($consultation->consultationDiagnoses as $consultationDiagnosis) {
+            $mkb10 = $this->repMkb10->findItem($consultationDiagnosis->codeMkb);
+
+            if ($mkb10 == null) {
+                $consultationDiagnosis->setStatusStandard(ConsultationHelper::STATUS_STANDARD_5);
+                $this->repConsultationDiagnosis->save($consultationDiagnosis);
+                continue;
+            }
+
+            $status    = ConsultationHelper::STATUS_STANDARD_5;
+            $listMkb10 = $this->repStandardMoscow->listByMkb10($mkb10->id);
+            $res       = ConsultationHelper::compareDestinationWithMoscow(
+                $listMkb10,
+                $consultationDiagnosis->consultationDiagnosisDestinations
+            );
+            if ($res) {
+                $status =
+                    ConsultationHelper::standardMoscowAllImportant($listMkb10) ?
+                        ConsultationHelper::STATUS_STANDARD_1 :
+                        ConsultationHelper::STATUS_STANDARD_2;
+            }
+
+            $consultationDiagnosis->setStatusStandard($status);
+            $this->repConsultationDiagnosis->save($consultationDiagnosis);
+        }
 
         $this->setStatusConsultation($consultation->id, ConsultationHelper::STATUS_SUCCESS);
+    }
+
+
+    /**
+     * @param int $consultationId
+     * @param int $statusStandard
+     *
+     * @return integer
+     */
+    public function countByStatusStandard(int $consultationId, int $statusStandard): int
+    {
+        return $this->repConsultationDiagnosis->countByStatusStandard($consultationId, $statusStandard);
     }
 }

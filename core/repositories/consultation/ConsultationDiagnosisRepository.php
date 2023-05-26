@@ -23,11 +23,24 @@ class ConsultationDiagnosisRepository
     }
 
 
-
     public function save(ConsultationDiagnosis $item)
     {
         if (!$item->save()) {
             throw new \RuntimeException('Ошибка сохранения данных');
         }
+    }
+
+
+    /**
+     * @param int $consultationId
+     * @param int $statusStandard
+     *
+     * @return integer
+     */
+    public function countByStatusStandard(int $consultationId, int $statusStandard): int
+    {
+        return ConsultationDiagnosis::find()->where(
+            ['consultationId' => $consultationId, 'statusStandard' => $statusStandard]
+        )->count();
     }
 }

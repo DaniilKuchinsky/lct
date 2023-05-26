@@ -8,6 +8,7 @@ use core\services\consultation\ConsultationService;
 use frontend\components\BaseController;
 use frontend\forms\ConsultationFinishSearch;
 use Yii;
+use yii\data\ArrayDataProvider;
 use yii\web\UploadedFile;
 
 
@@ -73,13 +74,38 @@ class SiteController extends BaseController
     {
         $consultation = $this->srvConsultation->getConsultationByUniqueId($id);
 
-        $searchModel = new ConsultationFinishSearch();
-        $dataProvider = $searchModel->search($consultation->id, Yii::$app->request->queryParams);
+        $arrData = [];
+
+        foreach (ConsultationHelper::getStatusStandardList() as $key => $name) {
+            $arrData[] = [
+                'statusId'       => $key,
+                'consultationId' => $consultation->uniqueId,
+                'name'           => $name,
+                'population'     => $this->srvConsultation->countByStatusStandard($consultation->id, $key),
+            ];
+        }
 
         return $this->render('finish', [
+            'dataProvider' => new ArrayDataProvider([
+                                                        'allModels'  => $arrData,
+                                                        'pagination' => false,
+                                                    ]),
+        ]);
+    }
+
+
+    public function actionResultInfo(string $id, int $statusStandard): string
+    {
+        $consultation = $this->srvConsultation->getConsultationByUniqueId($id);
+
+        $searchModel  = new ConsultationFinishSearch();
+        $dataProvider = $searchModel->search($consultation->id, $statusStandard, Yii::$app->request->queryParams);
+
+        return $this->render('result-info', [
             'consultation' => $consultation,
             'searchModel'  => $searchModel,
             'dataProvider' => $dataProvider,
+            'statusStandardName' => ConsultationHelper::getStatusStandardName($statusStandard)
         ]);
     }
 

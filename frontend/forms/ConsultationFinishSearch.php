@@ -41,11 +41,12 @@ class ConsultationFinishSearch extends CookieModel
 
     /**
      * @param int   $consultationId
+     * @param int   $statusStandard
      * @param array $params
      *
      * @return ActiveDataProvider
      */
-    public function search(int $consultationId, array $params): ActiveDataProvider
+    public function search(int $consultationId, int $statusStandard, array $params): ActiveDataProvider
     {
         $query = ConsultationDiagnosis::find()
                                       ->alias('cd')
@@ -122,6 +123,8 @@ class ConsultationFinishSearch extends CookieModel
 
             return $dataProvider;
         }
+
+        $query->andWhere(['statusStandard' => $statusStandard]);
 
         if (null !== $this->dateBirth && strpos($this->dateBirth, ' - ') !== false) {
             [$dateStart, $dateFinish] = explode(' - ', $this->dateBirth);
