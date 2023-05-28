@@ -33,6 +33,12 @@ use hail812\adminlte\widgets\Menu;
                                           'active' => $this->context->id == 'standard-moscow',
                                       ],
                                       [
+                                          'label' => 'Стандарт Федеральный',
+                                          'icon'  => 'th',
+                                          'url'   => ['standard-federal/index'],
+                                          'active' => $this->context->id == 'standard-federal',
+                                      ],
+                                      [
                                           'label' => 'Консультации',
                                           'icon'  => 'th',
                                           'url'   => ['consultation/index'],

@@ -83,10 +83,14 @@ class ConsultationDiagnosisDestination extends ActiveRecord
 
 
     /**
-     * @param int $newStatus
+     * @param int      $newStatus
+     * @param int|null $standardMoscowId
+     * @param int|null $standardFederalId
      */
-    public function setStatusStandard(int $newStatus)
+    public function setStatusStandard(int $newStatus, ?int $standardMoscowId, ?int $standardFederalId)
     {
-        $this->statusStandard = $newStatus;
+        $this->statusStandard    = $newStatus;
+        $this->standardMoscowId  = $standardMoscowId;
+        $this->standardFederalId = $standardFederalId;
     }
 }

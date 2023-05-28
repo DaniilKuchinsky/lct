@@ -14,6 +14,7 @@ use core\repositories\consultation\ConsultationDiagnosisRepository;
 use core\repositories\consultation\ConsultationRepository;
 use core\repositories\dictionary\DestinationRepository;
 use core\repositories\dictionary\Mkb10Repository;
+use core\repositories\standard\StandardFederalRepository;
 use core\repositories\standard\StandardMoscowRepository;
 use yii\helpers\FileHelper;
 use yii\web\UploadedFile;
@@ -34,6 +35,8 @@ class ConsultationService
 
     protected StandardMoscowRepository                   $repStandardMoscow;
 
+    protected StandardFederalRepository                  $repStandardFederal;
+
 
     public function __construct(
         ConsultationRepository                     $repConsultation,
@@ -42,6 +45,7 @@ class ConsultationService
         Mkb10Repository                            $repMkb10,
         DestinationRepository                      $repDestination,
         StandardMoscowRepository                   $repStandardMoscow,
+        StandardFederalRepository                  $repStandardFederal,
         EventDispatcher                            $dispatcher
     ) {
         $this->repConsultation                     = $repConsultation;
@@ -50,6 +54,7 @@ class ConsultationService
         $this->repMkb10                            = $repMkb10;
         $this->repDestination                      = $repDestination;
         $this->repStandardMoscow                   = $repStandardMoscow;
+        $this->repStandardFederal                  = $repStandardFederal;
         $this->dispatcher                          = $dispatcher;
     }
 
@@ -187,7 +192,9 @@ class ConsultationService
             $mkb10 = $this->repMkb10->findItem($consultationDiagnosis->codeMkb);
 
             foreach ($consultationDiagnosis->consultationDiagnosisDestinations as $consultationDiagnosisDestination) {
-                $status = ConsultationHelper::STATUS_STANDARD_5;
+                $status            = ConsultationHelper::STATUS_STANDARD_5;
+                $standardMoscowId  = null;
+                $standardFederalId = null;
 
                 $destination = $this->repDestination->findItem($consultationDiagnosisDestination->name);
 
@@ -198,10 +205,22 @@ class ConsultationService
                         $status = $standardMoscow->isImportant ?
                             ConsultationHelper::STATUS_STANDARD_1 :
                             ConsultationHelper::STATUS_STANDARD_2;
+
+                        $standardMoscowId = $standardMoscow->id;
+                    }
+
+                    $standardFederal = $this->repStandardFederal->findItem($mkb10->id, $destination->id);
+
+                    if ($standardFederal) {
+                        $status = $standardFederal->isImportant ?
+                            ConsultationHelper::STATUS_STANDARD_3 :
+                            ConsultationHelper::STATUS_STANDARD_4;
+
+                        $standardFederalId = $standardFederal->id;
                     }
                 }
 
-                $consultationDiagnosisDestination->setStatusStandard($status);
+                $consultationDiagnosisDestination->setStatusStandard($status, $standardMoscowId, $standardFederalId);
                 $this->repConsultationDiagnosisDestination->save($consultationDiagnosisDestination);
             }
         }

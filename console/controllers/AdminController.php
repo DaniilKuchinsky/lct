@@ -37,12 +37,12 @@ class AdminController extends Controller
 
     public function actionExcel()
     {
-        $fileName = \Yii::$app->getBasePath() . '/msc.xlsx';
+        $fileName = \Yii::$app->getBasePath() . '/fed.xlsx';
 
         $data = Excel::widget([
                                   'mode'     => 'import',
                                   'fileName' => $fileName,
-                                  'getOnlySheet' => 'СППВР Москва'
+                                  'getOnlySheet' => 'Федеральный стандарт'
                               ]);
 
         $indx = 1;
