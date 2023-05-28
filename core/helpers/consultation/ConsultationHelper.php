@@ -165,14 +165,27 @@ class ConsultationHelper
 
     /**
      * @param StandardMoscow[] $standards
+     * @param ConsultationDiagnosisDestination[] $destinations
      *
      * @return bool
      */
-    public static function standardMoscowAllImportant(array $standards): bool
+    public static function standardMoscowAllImportant(array $standards, array $destinations): bool
     {
-        if (count($standards) == 0) {
+        if (count($standards) == 0 || count($destinations) == 0) {
             return false;
         }
+
+        $arrName = [];
+        foreach ($standards as $standard) {
+            $arrName[] = $standard->destination->name;
+        }
+
+        foreach ($destinations as $destination) {
+            if (($key = array_search($destination->name, $arrName)) !== false) {
+                unset($arrName[ $key ]);
+            }
+        }
+        
         foreach ($standards as $standard) {
             if (!$standard->isImportant) {
                 return false;

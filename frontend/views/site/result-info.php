@@ -2,6 +2,7 @@
 
 use core\entities\consultation\Consultation;
 use core\entities\consultation\ConsultationDiagnosis;
+use core\entities\consultation\ConsultationDiagnosisDestination;
 use core\helpers\user\UserHelper;
 use frontend\forms\ConsultationFinishSearch;
 use kartik\daterange\DateRangePicker;
@@ -46,8 +47,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                      'encodeLabel'    => false,
                                      'headerOptions'  => ['style' => 'text-align:center;'],
                                      'contentOptions' => ['style' => 'text-align:center;'],
-                                     'value'          => function (ConsultationDiagnosis $model) {
-                                         return UserHelper::getSexName($model->sex);
+                                     'value'          => function (ConsultationDiagnosisDestination $model) {
+                                         return UserHelper::getSexName($model->consultationDiagnosis->sex);
                                      },
                                      'filter'         => $searchModel->sexList(),
                                  ],
@@ -56,8 +57,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                      'attribute'      => 'dateBirth',
                                      'label'          => 'Дата<br/>рождения<br/>пациента',
                                      'encodeLabel'    => false,
-                                     'value'          => function (ConsultationDiagnosis $model) {
-                                         return $model->dateOfBirthStr;
+                                     'value'          => function (ConsultationDiagnosisDestination $model) {
+                                         return $model->consultationDiagnosis->dateOfBirthStr;
                                      },
                                      'headerOptions'  => ['style' => 'text-align:center;'],
                                      'contentOptions' => ['style' => 'text-align:center;'],
@@ -85,6 +86,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                      'encodeLabel'    => false,
                                      'headerOptions'  => ['style' => 'text-align:center;'],
                                      'contentOptions' => ['style' => 'text-align:center;'],
+                                     'value'          => function (ConsultationDiagnosisDestination $model) {
+                                         return $model->consultationDiagnosis->patientId;
+                                     },
                                  ],
                                  [
                                      'format'         => 'raw',
@@ -93,12 +97,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                      'encodeLabel'    => false,
                                      'headerOptions'  => ['style' => 'text-align:center;'],
                                      'contentOptions' => ['style' => 'text-align:center;'],
+                                     'value'          => function (ConsultationDiagnosisDestination $model) {
+                                         return $model->consultationDiagnosis->codeMkb;
+                                     },
                                  ],
                                  [
                                      'format'        => 'raw',
                                      'attribute'     => 'diagnosis',
                                      'label'         => 'Диагноз',
                                      'headerOptions' => ['style' => 'text-align:center;'],
+                                     'value'         => function (ConsultationDiagnosisDestination $model) {
+                                         return $model->consultationDiagnosis->diagnosis;
+                                     },
                                  ],
                                  [
                                      'format'         => 'raw',
@@ -107,8 +117,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                      'encodeLabel'    => false,
                                      'headerOptions'  => ['style' => 'text-align:center;'],
                                      'contentOptions' => ['style' => 'text-align:center;'],
-                                     'value'          => function (ConsultationDiagnosis $model) {
-                                         return $model->dateServiceStr;
+                                     'value'          => function (ConsultationDiagnosisDestination $model) {
+                                         return $model->consultationDiagnosis->dateServiceStr;
                                      },
                                      'filter'         => DateRangePicker::widget(
                                          [
@@ -132,19 +142,17 @@ $this->params['breadcrumbs'][] = $this->title;
                                      'attribute'     => 'jobName',
                                      'label'         => 'Должность',
                                      'headerOptions' => ['style' => 'text-align:center;'],
+                                     'value'         => function (ConsultationDiagnosisDestination $model) {
+                                         return $model->consultationDiagnosis->jobName;
+                                     },
                                  ],
                                  [
                                      'format'        => 'raw',
                                      'attribute'     => 'destination',
                                      'headerOptions' => ['style' => 'text-align:center;'],
                                      'label'         => 'Назначения',
-                                     'value'         => function (ConsultationDiagnosis $model) {
-                                         $str = "";
-                                         foreach ($model->consultationDiagnosisDestinations as $item) {
-                                             $str .= $item->name . '<br/>';
-                                         }
-
-                                         return $str;
+                                     'value'         => function (ConsultationDiagnosisDestination $model) {
+                                         return $model->name;
                                      },
                                  ],
 

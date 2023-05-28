@@ -2,6 +2,7 @@
 
 namespace core\repositories\consultation;
 
+use core\entities\consultation\ConsultationDiagnosis;
 use core\entities\consultation\ConsultationDiagnosisDestination;
 
 class ConsultationDiagnosisDestinationRepository
@@ -27,5 +28,26 @@ class ConsultationDiagnosisDestinationRepository
         if (!$item->save()) {
             throw new \RuntimeException('Ошибка сохранения данных');
         }
+    }
+
+
+    /**
+     * @param int $consultationId
+     * @param int $statusStandard
+     *
+     * @return integer
+     */
+    public function countByStatusStandard(int $consultationId, int $statusStandard): int
+    {
+        return ConsultationDiagnosisDestination::find()
+                                               ->alias('cdd')
+                                               ->innerJoin(['cd' => ConsultationDiagnosis::tableName()],
+                                                           'cd.id = cdd."consultationDiagnosisId"')
+                                               ->where(
+                                                   [
+                                                       'consultationId' => $consultationId,
+                                                       'statusStandard' => $statusStandard,
+                                                   ]
+                                               )->count();
     }
 }

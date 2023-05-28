@@ -20,7 +20,6 @@ use yii\db\ActiveRecord;
  * @property string                             $jobName
  * @property integer                            $created
  * @property integer                            $updated
- * @property integer                            $statusStandard
  *
  * @property ConsultationDiagnosisDestination[] $consultationDiagnosisDestinations
  */
@@ -112,14 +111,5 @@ class ConsultationDiagnosis extends ActiveRecord
         $item->jobName        = $jobName;
 
         return $item;
-    }
-
-
-    /**
-     * @param int $newStatus
-     */
-    public function setStatusStandard(int $newStatus)
-    {
-        $this->statusStandard = $newStatus;
     }
 }

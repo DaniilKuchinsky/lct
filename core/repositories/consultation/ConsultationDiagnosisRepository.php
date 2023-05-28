@@ -30,17 +30,4 @@ class ConsultationDiagnosisRepository
         }
     }
 
-
-    /**
-     * @param int $consultationId
-     * @param int $statusStandard
-     *
-     * @return integer
-     */
-    public function countByStatusStandard(int $consultationId, int $statusStandard): int
-    {
-        return ConsultationDiagnosis::find()->where(
-            ['consultationId' => $consultationId, 'statusStandard' => $statusStandard]
-        )->count();
-    }
 }

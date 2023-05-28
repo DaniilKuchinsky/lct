@@ -37,11 +37,25 @@ class StandardMoscowRepository
 
     /**
      * @param int $mkb10Id
+     * @param int $destinationId
+     *
+     * @return StandardMoscow
+     */
+    public function findItem(int $mkb10Id, int $destinationId): ?StandardMoscow
+    {
+        return StandardMoscow::findOne(['mkb10Id' => $mkb10Id, 'destinationId' => $destinationId]);
+    }
+
+
+    /**
+     * @param int  $mkb10Id
+     * @param bool $isImportant
      *
      * @return StandardMoscow[]
      */
-    public function listByMkb10(int $mkb10Id): array
+    public function listByMkb10(int $mkb10Id, bool $isImportant = null): array
     {
-        return StandardMoscow::find()->where(['mkb10Id' => $mkb10Id])->all();
+        return StandardMoscow::find()->where(['mkb10Id' => $mkb10Id])
+                             ->andFilterWhere(['isImportant' => $isImportant])->all();
     }
 }

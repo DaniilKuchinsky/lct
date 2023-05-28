@@ -186,27 +186,24 @@ class ConsultationService
         foreach ($consultation->consultationDiagnoses as $consultationDiagnosis) {
             $mkb10 = $this->repMkb10->findItem($consultationDiagnosis->codeMkb);
 
-            if ($mkb10 == null) {
-                $consultationDiagnosis->setStatusStandard(ConsultationHelper::STATUS_STANDARD_5);
-                $this->repConsultationDiagnosis->save($consultationDiagnosis);
-                continue;
-            }
+            foreach ($consultationDiagnosis->consultationDiagnosisDestinations as $consultationDiagnosisDestination) {
+                $status = ConsultationHelper::STATUS_STANDARD_5;
 
-            $status    = ConsultationHelper::STATUS_STANDARD_5;
-            $listMkb10 = $this->repStandardMoscow->listByMkb10($mkb10->id);
-            $res       = ConsultationHelper::compareDestinationWithMoscow(
-                $listMkb10,
-                $consultationDiagnosis->consultationDiagnosisDestinations
-            );
-            if ($res) {
-                $status =
-                    ConsultationHelper::standardMoscowAllImportant($listMkb10) ?
-                        ConsultationHelper::STATUS_STANDARD_1 :
-                        ConsultationHelper::STATUS_STANDARD_2;
-            }
+                $destination = $this->repDestination->findItem($consultationDiagnosisDestination->name);
 
-            $consultationDiagnosis->setStatusStandard($status);
-            $this->repConsultationDiagnosis->save($consultationDiagnosis);
+                if ($mkb10 != null && $destination != null) {
+                    $standardMoscow = $this->repStandardMoscow->findItem($mkb10->id, $destination->id);
+
+                    if ($standardMoscow) {
+                        $status = $standardMoscow->isImportant ?
+                            ConsultationHelper::STATUS_STANDARD_1 :
+                            ConsultationHelper::STATUS_STANDARD_2;
+                    }
+                }
+
+                $consultationDiagnosisDestination->setStatusStandard($status);
+                $this->repConsultationDiagnosisDestination->save($consultationDiagnosisDestination);
+            }
         }
 
         $this->setStatusConsultation($consultation->id, ConsultationHelper::STATUS_SUCCESS);
@@ -221,6 +218,6 @@ class ConsultationService
      */
     public function countByStatusStandard(int $consultationId, int $statusStandard): int
     {
-        return $this->repConsultationDiagnosis->countByStatusStandard($consultationId, $statusStandard);
+        return $this->repConsultationDiagnosisDestination->countByStatusStandard($consultationId, $statusStandard);
     }
 }

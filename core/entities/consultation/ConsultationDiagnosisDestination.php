@@ -2,17 +2,25 @@
 
 namespace core\entities\consultation;
 
+use core\entities\standard\StandardMoscow;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
  * Назначения диагноза консультации
  *
- * @property integer $id
- * @property integer $consultationDiagnosisId
- * @property string  $name
- * @property integer $created
- * @property integer $updated
+ * @property integer               $id
+ * @property integer               $consultationDiagnosisId
+ * @property string                $name
+ * @property integer               $statusStandard
+ * @property integer               $standardMoscowId
+ * @property integer               $standardFederalId
+ * @property integer               $created
+ * @property integer               $updated
+ *
+ * @property ConsultationDiagnosis $consultationDiagnosis
+ * @property StandardMoscow        $standardMoscow
  */
 class ConsultationDiagnosisDestination extends ActiveRecord
 {
@@ -22,6 +30,24 @@ class ConsultationDiagnosisDestination extends ActiveRecord
     public static function tableName(): string
     {
         return 'consultation_diagnosis_destination';
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getConsultationDiagnosis(): ActiveQuery
+    {
+        return $this->hasOne(ConsultationDiagnosis::className(), ['id' => 'consultationDiagnosisId']);
+    }
+
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStandardMoscow(): ActiveQuery
+    {
+        return $this->hasOne(StandardMoscow::className(), ['id' => 'standardMoscowId']);
     }
 
 
@@ -53,5 +79,14 @@ class ConsultationDiagnosisDestination extends ActiveRecord
         $item->name                    = $name;
 
         return $item;
+    }
+
+
+    /**
+     * @param int $newStatus
+     */
+    public function setStatusStandard(int $newStatus)
+    {
+        $this->statusStandard = $newStatus;
     }
 }

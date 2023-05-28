@@ -1,6 +1,7 @@
 <?php
 
 use core\entities\consultation\ConsultationDiagnosis;
+use core\entities\consultation\ConsultationDiagnosisDestination;
 use yii\db\Migration;
 
 /**
@@ -13,7 +14,7 @@ class m230526_045459_updateTable_consultationStandard extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn(ConsultationDiagnosis::tableName(), 'statusStandard', $this->smallInteger());
+        $this->addColumn(ConsultationDiagnosisDestination::tableName(), 'statusStandard', $this->smallInteger());
     }
 
 
@@ -22,6 +23,6 @@ class m230526_045459_updateTable_consultationStandard extends Migration
      */
     public function safeDown()
     {
-        $this->dropColumn(ConsultationDiagnosis::tableName(), 'statusStandard');
+        $this->dropColumn(ConsultationDiagnosisDestination::tableName(), 'statusStandard');
     }
 }

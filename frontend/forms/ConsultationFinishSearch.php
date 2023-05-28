@@ -4,6 +4,7 @@ namespace frontend\forms;
 
 use core\entities\consultation\Consultation;
 use core\entities\consultation\ConsultationDiagnosis;
+use core\entities\consultation\ConsultationDiagnosisDestination;
 use core\helpers\consultation\ConsultationHelper;
 use core\helpers\user\UserHelper;
 use core\models\CookieModel;
@@ -48,9 +49,13 @@ class ConsultationFinishSearch extends CookieModel
      */
     public function search(int $consultationId, int $statusStandard, array $params): ActiveDataProvider
     {
-        $query = ConsultationDiagnosis::find()
-                                      ->alias('cd')
-                                      ->innerJoin(['cs' => Consultation::tableName()], 'cs."id" = cd."consultationId"');
+        $query =
+            ConsultationDiagnosisDestination::find()
+                                            ->alias('cdd')
+                                            ->innerJoin(['cd' => ConsultationDiagnosis::tableName()],
+                                                        'cd.id = cdd."consultationDiagnosisId"')
+                                            ->innerJoin(['cs' => Consultation::tableName()],
+                                                        'cs."id" = cd."consultationId"');
 
         $dataProvider = new ActiveDataProvider([
                                                    'query' => $query,
@@ -124,7 +129,7 @@ class ConsultationFinishSearch extends CookieModel
             return $dataProvider;
         }
 
-        $query->andWhere(['statusStandard' => $statusStandard]);
+        $query->andWhere(['cdd."statusStandard"' => $statusStandard]);
 
         if (null !== $this->dateBirth && strpos($this->dateBirth, ' - ') !== false) {
             [$dateStart, $dateFinish] = explode(' - ', $this->dateBirth);
